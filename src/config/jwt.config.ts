@@ -10,7 +10,7 @@ export type Payload = {
   email: string;
 };
 
-export const accessTokenConfig = (): JwtConfig => ({
-  secret: process.env.ACCESS_TOKEN_SECRET,
-  expiresIn: '1h',
-});
+// export const accessTokenConfig = (): JwtConfig => ({
+//   secret: process.env.ACCESS_TOKEN_SECRET,
+//   expiresIn: '1h',
+// });

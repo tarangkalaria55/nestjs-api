@@ -9,7 +9,7 @@ import {
 import { AuthDto, LoginDto, RegisterDto } from '../dto';
 import { CurrentUser, Public } from '../decorator';
 import { AuthService } from 'src/services/auth.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
@@ -19,6 +19,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @ApiOkResponse({ type: AuthDto })
   async register(@Body() dto: RegisterDto): Promise<AuthDto> {
     return this.authService.register(dto);
   }
@@ -30,6 +31,7 @@ export class AuthController {
   }
 
   @Get()
+  @ApiOkResponse({ type: AuthDto })
   getAuth(@CurrentUser() user: AuthDto): AuthDto {
     return user;
   }

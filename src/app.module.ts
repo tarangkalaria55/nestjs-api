@@ -1,29 +1,24 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { accessTokenConfig } from './config';
 import { User, UserSchema } from './schema';
-import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
-import { JwtStrategy } from './strategy';
 import { UserRepository } from './repository';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './guard';
 import { ChatGateway } from './gateways/chat.gateway';
+import { NestjsConfigModule } from './nestjs-config/nestjs-config.module';
+import { NestjsConfigService } from './nestjs-config/nestjs-config.service';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guard';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [accessTokenConfig],
-    }),
+    NestjsConfigModule,
     MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        uri: config.get<string>('MONGO_URI'),
+      imports: [NestjsConfigModule],
+      inject: [NestjsConfigService],
+      useFactory: async (config: NestjsConfigService) => ({
+        uri: config.MONGO_URI,
       }),
     }),
     MongooseModule.forFeature([
@@ -32,18 +27,25 @@ import { ChatGateway } from './gateways/chat.gateway';
         schema: UserSchema,
       },
     ]),
-    PassportModule.register({
-      session: false,
+    JwtModule.registerAsync({
+      imports: [NestjsConfigModule],
+      inject: [NestjsConfigService],
+      useFactory: async (config: NestjsConfigService) =>
+        ({
+          global: true,
+          secret: config.ACCESS_TOKEN_SECRET,
+          signOptions: {
+            expiresIn: config.ACCESS_TOKEN_EXPIRES_IN,
+          },
+        }) as JwtModuleOptions,
     }),
-    JwtModule.register({}),
   ],
   controllers: [AuthController],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
+      useClass: AuthGuard,
     },
-    JwtStrategy,
     AuthService,
     UserRepository,
     ChatGateway,

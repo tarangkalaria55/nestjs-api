@@ -7,14 +7,16 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../repository';
 import { LoginDto, RegisterDto } from '../dto';
 import { ObjectId } from 'bson';
-import { JwtConfig, Payload, accessTokenConfig } from 'src/config';
+import { JwtConfig, Payload } from 'src/config';
 import { AuthDto } from '../dto/auth.dto';
+import { NestjsConfigService } from 'src/nestjs-config/nestjs-config.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly config: NestjsConfigService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthDto> {
@@ -42,7 +44,10 @@ export class AuthService {
       email: user.email,
     };
 
-    const accessToken = this.generateJWT(payload, accessTokenConfig());
+    const accessToken = this.generateJWT(
+      payload,
+      this.config.accessTokenConfig,
+    );
 
     return {
       access_token: accessToken,
