@@ -1,0 +1,23 @@
+{
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"**/Thumbs.db": true
+	},
+	"hide-files.files": [],
+	"prettier.configPath": ".prettierrc",
+	"editor.formatOnSave": true,
+	"editor.tabSize": 2,
+	"editor.indentSize": "tabSize",
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"editor.fontFamily": "'Fira Code', Consolas, 'Courier New', monospace",
+	"editor.fontLigatures": true,
+	"editor.fontSize": 14,
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
+}
